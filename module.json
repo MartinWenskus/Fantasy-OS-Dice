@@ -1,0 +1,34 @@
+{
+  "id": "fantasy-os-dice",
+  "title": "Fantasy-OS Dice",
+  "description": "Verbindet freigegebene Fantasy-OS-Charaktere mit Foundry VTT und würfelt Standardwürfel, Formeln und Attributproben direkt in den Chat.",
+  "version": "0.2.0",
+  "authors": [
+    {
+      "name": "Fantasy-OS"
+    }
+  ],
+  "compatibility": {
+    "minimum": "13",
+    "verified": "14"
+  },
+  "esmodules": [
+    "scripts/fantasy-os-dice.js"
+  ],
+  "styles": [
+    "styles/fantasy-os-dice.css"
+  ],
+  "languages": [
+    {
+      "lang": "de",
+      "name": "Deutsch",
+      "path": "lang/de.json"
+    },
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "icon": "assets/fantasy-os-dice.svg"
+}

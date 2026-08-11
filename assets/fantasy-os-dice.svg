@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Fantasy-OS Dice</title>
+  <defs>
+    <linearGradient id="bg" x1="16" y1="8" x2="112" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c9a8ff"/>
+      <stop offset="1" stop-color="#7540c9"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#171123"/>
+  <path d="M64 15 106 39l-8 52-34 22-34-22-8-52 42-24Z" fill="url(#bg)" stroke="#eadcff" stroke-width="4" stroke-linejoin="round"/>
+  <path d="m22 39 42 20 42-20M64 59v54M30 91l34-32 34 32" fill="none" stroke="#3a205f" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="64" cy="51" r="7" fill="#171123"/>
+  <circle cx="43" cy="75" r="5" fill="#171123"/>
+  <circle cx="84" cy="75" r="5" fill="#171123"/>
+</svg>

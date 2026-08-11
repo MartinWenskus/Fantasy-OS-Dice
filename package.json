@@ -1,0 +1,9 @@
+{
+  "name": "fantasy-os-dice",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check scripts/character-api.js && node --check scripts/dice-formula.js && node --check scripts/fantasy-os-dice.js && node --test"
+  }
+}
