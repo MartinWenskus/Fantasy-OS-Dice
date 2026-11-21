@@ -6,7 +6,7 @@ export const DICE_LIMITS = Object.freeze({
 
 export const DICE_SIDES = Object.freeze([4, 6, 8, 10, 12, 20, 100]);
 
-export const VISIBILITY_MODES = Object.freeze(["public", "gm", "blind", "self"]);
+export const VISIBILITY_MODES = Object.freeze(['public', 'gm', 'blind', 'self']);
 
 export function toBoundedInteger(value, limits) {
   const parsed = Number.parseInt(String(value), 10);
@@ -18,13 +18,13 @@ export function buildDiceFormula({ count, sides, modifier }) {
   const safeCount = toBoundedInteger(count, DICE_LIMITS.count);
   const safeSides = toBoundedInteger(sides, DICE_LIMITS.sides);
   const safeModifier = toBoundedInteger(modifier, DICE_LIMITS.modifier);
-  const modifierTerm = safeModifier === 0 ? "" : ` ${safeModifier > 0 ? "+" : "-"} ${Math.abs(safeModifier)}`;
+  const modifierTerm = safeModifier === 0 ? '' : ` ${safeModifier > 0 ? '+' : '-'} ${Math.abs(safeModifier)}`;
 
   return `${safeCount}d${safeSides}${modifierTerm}`;
 }
 
 export function normalizeVisibilityMode(mode) {
-  return VISIBILITY_MODES.includes(mode) ? mode : "public";
+  return VISIBILITY_MODES.includes(mode) ? mode : 'public';
 }
 
 export function getFoundryMessageMode(mode, generation) {
@@ -35,9 +35,9 @@ export function getFoundryMessageMode(mode, generation) {
   }
 
   return {
-    public: "publicroll",
-    gm: "gmroll",
-    blind: "blindroll",
-    self: "selfroll",
+    public: 'publicroll',
+    gm: 'gmroll',
+    blind: 'blindroll',
+    self: 'selfroll',
   }[normalized];
 }

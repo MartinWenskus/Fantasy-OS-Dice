@@ -1,8 +1,9 @@
 {
   "id": "fantasy-os-dice",
+  "type": "module",
   "title": "Fantasy-OS Dice",
-  "description": "Verbindet freigegebene Fantasy-OS-Charaktere mit Foundry VTT und würfelt Standardwürfel, Formeln und Attributproben direkt in den Chat.",
-  "version": "0.2.0",
+  "description": "Fantasy-OS Spielbegleiter: Charaktere, Fertigkeiten, Zauber, Ressourcen, Fähigkeiten und Rasten in Foundry VTT.",
+  "version": "0.4.1",
   "authors": [
     {
       "name": "Fantasy-OS"
@@ -30,5 +31,8 @@
       "path": "lang/en.json"
     }
   ],
-  "icon": "assets/fantasy-os-dice.svg"
+  "icon": "assets/fantasy-os-dice.svg",
+  "url": "https://github.com/MartinWenskus/Fantasy-OS-Dice",
+  "manifest": "https://raw.githubusercontent.com/MartinWenskus/Fantasy-OS-Dice/refs/heads/main/module.json",
+  "download": "https://raw.githubusercontent.com/MartinWenskus/Fantasy-OS-Dice/refs/heads/main/dist/fantasy-os-dice-0.4.1.zip"
 }

@@ -1,9 +1,9 @@
 {
   "name": "fantasy-os-dice",
-  "version": "0.2.0",
+  "version": "0.4.1",
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check scripts/character-api.js && node --check scripts/dice-formula.js && node --check scripts/fantasy-os-dice.js && node --test"
+    "check": "node --check scripts/character-api.js && node --check scripts/dice-formula.js && node --check scripts/foundry-chat.js && node --check scripts/game-sync.js && node --check scripts/game-api.js && node --check scripts/gameplay.js && node --check scripts/gameplay-store.js && node --check scripts/gameplay-panel.js && node --check scripts/fantasy-os-dice.js && node --test"
   }
 }
