@@ -85,14 +85,16 @@ export class PortalGameStore {
           Authorization: `Bearer ${this.connection.token}`,
         },
       });
-      const payload = await response.json();
       if (!response.ok) {
+        const payload = await response.json().catch(() => null);
         const error = new Error(
           response.status === 401 || response.status === 403 ? 'GameAccessDenied' : 'GameSyncFailed',
         );
         error.code = payload?.data?.code;
+        error.status = response.status;
         throw error;
       }
+      const payload = await response.json();
       if (payload.apiVersion !== 1 || !payload.state || payload.state.schemaVersion !== 1)
         throw new Error('GameSyncFailed');
       return payload;

@@ -3,7 +3,7 @@
   "type": "module",
   "title": "Fantasy-OS Dice",
   "description": "Fantasy-OS Spielbegleiter: Charaktere, Fertigkeiten, Zauber, Ressourcen, Fähigkeiten und Rasten in Foundry VTT.",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "authors": [
     {
       "name": "Fantasy-OS"
@@ -33,5 +33,5 @@
   ],
   "url": "https://github.com/MartinWenskus/Fantasy-OS-Dice",
   "manifest": "https://raw.githubusercontent.com/MartinWenskus/Fantasy-OS-Dice/refs/heads/main/module.json",
-  "download": "https://raw.githubusercontent.com/MartinWenskus/Fantasy-OS-Dice/refs/heads/main/dist/fantasy-os-dice-0.4.2.zip"
+  "download": "https://raw.githubusercontent.com/MartinWenskus/Fantasy-OS-Dice/refs/heads/main/dist/fantasy-os-dice-0.4.3.zip"
 }

@@ -15,6 +15,7 @@ const ROOT_ID = 'fantasy-os-dice-root';
 const MAX_CUSTOM_FORMULA_LENGTH = 200;
 const CHARACTER_SETTING = 'characterShareUrl';
 const CHARACTER_REQUEST_TIMEOUT = 10_000;
+const RECONNECT_DELAYS = [1_000, 3_000];
 
 function localize(key) {
   return game.i18n.localize(`FOSDice.${key}`);
@@ -37,6 +38,22 @@ function registerSettings() {
   });
 }
 
+async function fetchSharedCharacter(connection) {
+  const response = await fetch(buildCharacterApiUrl(connection), {
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${connection.shareKey}`,
+    },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(CHARACTER_REQUEST_TIMEOUT),
+  });
+  if (!response.ok) {
+    const key = [401, 403, 404].includes(response.status) ? 'CharacterNotFound' : 'CharacterServiceUnavailable';
+    throw Object.assign(new Error(key), { status: response.status });
+  }
+  return response.json();
+}
+
 class FantasyOSDiceTray {
   constructor() {
     this.root = null;
@@ -55,6 +72,8 @@ class FantasyOSDiceTray {
     this.character = null;
     this.isConnecting = false;
     this.isRolling = false;
+    this.connectionScope = `${game.world.id}:${game.user.id}`;
+    this.connectionStorageKey = `${MODULE_ID}.connection:${encodeURIComponent(this.connectionScope)}`;
     this.handleKeydown = this.handleKeydown.bind(this);
   }
 
@@ -335,14 +354,47 @@ class FantasyOSDiceTray {
   }
 
   async restoreCharacterConnection() {
-    const shareUrl = game.settings.get(MODULE_ID, CHARACTER_SETTING);
+    let shareUrl;
+    try {
+      shareUrl = localStorage.getItem(this.connectionStorageKey);
+      if (shareUrl === null) {
+        // Previous versions used a single Foundry client setting for the whole browser.
+        shareUrl = game.settings.get(MODULE_ID, CHARACTER_SETTING);
+        if (typeof shareUrl === 'string' && shareUrl.trim()) {
+          localStorage.setItem(this.connectionStorageKey, shareUrl);
+          localStorage.removeItem(`${MODULE_ID}.${CHARACTER_SETTING}`);
+        }
+      }
+    } catch {
+      this.setCharacterState('error', localize('ConnectionStorageUnavailable'));
+      return;
+    }
     if (typeof shareUrl !== 'string' || !shareUrl.trim()) return;
 
     this.characterShareUrlInput.value = shareUrl;
-    await this.connectCharacter(shareUrl, { persist: false, silent: true });
+    await this.connectCharacter(shareUrl, { restore: true });
   }
 
-  async connectCharacter(shareUrl, { persist = true, silent = false } = {}) {
+  async loadConnection(load, retry) {
+    const delays = retry ? RECONNECT_DELAYS : [];
+    for (const delay of delays) {
+      try {
+        return await load();
+      } catch (error) {
+        const transient =
+          error instanceof TypeError ||
+          error.name === 'AbortError' ||
+          error.name === 'TimeoutError' ||
+          error.status === 429 ||
+          error.status >= 500;
+        if (!transient) throw error;
+      }
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+    return load();
+  }
+
+  async connectCharacter(shareUrl, { restore = false } = {}) {
     if (this.isConnecting || this.gameplay?.busy || this.isRolling) return null;
 
     let connection;
@@ -361,65 +413,45 @@ class FantasyOSDiceTray {
       return null;
     }
 
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), CHARACTER_REQUEST_TIMEOUT);
     this.isConnecting = true;
     this.setCharacterState('loading');
     this.updateConnectButtons();
 
     try {
-      if (connection.mode === 'game') {
-        const store = new PortalGameStore(connection, { scope: `${game.world?.id ?? 'world'}:${game.user.id}` });
-        const payload = await store.refresh();
-        this.character = readCharacterApiPayload(payload);
-        await this.gameplay.setCharacter(this.character, connection.origin, store);
-      } else {
-        const response = await fetch(buildCharacterApiUrl(connection), {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${connection.shareKey}`,
-          },
-          cache: 'no-store',
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          const message =
-            response.status === 401 || response.status === 404
-              ? localize('CharacterNotFound')
-              : localize('CharacterServiceUnavailable');
-          throw new Error(message);
-        }
-
-        const payload = await response.json();
-        this.character = readCharacterApiPayload(payload);
-        await this.gameplay.setCharacter(this.character, connection.origin);
-      }
+      const store =
+        connection.mode === 'game' ? new PortalGameStore(connection, { scope: this.connectionScope }) : null;
+      const payload = await this.loadConnection(
+        () => (store ? store.refresh() : fetchSharedCharacter(connection)),
+        restore,
+      );
+      this.character = readCharacterApiPayload(payload);
+      await this.gameplay.setCharacter(this.character, connection.origin, store);
       this.characterShareUrlInput.value = connection.canonicalUrl;
-      if (persist) {
-        await game.settings.set(MODULE_ID, CHARACTER_SETTING, connection.canonicalUrl);
+      if (!restore) {
+        try {
+          localStorage.setItem(this.connectionStorageKey, connection.canonicalUrl);
+        } catch {
+          ui.notifications.warn(localize('ConnectionStorageUnavailable'));
+        }
       }
 
       this.renderCharacter();
       this.setCharacterState('connected');
-      if (!silent) ui.notifications.info(localize('CharacterConnected'));
+      if (!restore) ui.notifications.info(localize('CharacterConnected'));
       return this.character;
     } catch (error) {
-      const message =
-        error.name === 'AbortError'
-          ? localize('CharacterRequestTimeout')
-          : game.i18n.has(`FOSDice.${error.message}`)
-            ? localize(error.message)
-            : error.message || localize('CharacterServiceUnavailable');
+      const message = ['AbortError', 'TimeoutError'].includes(error.name)
+        ? localize('CharacterRequestTimeout')
+        : game.i18n.has(`FOSDice.${error.message}`)
+          ? localize(error.message)
+          : error.message || localize('CharacterServiceUnavailable');
       this.character = null;
       await this.gameplay.setCharacter(null);
       this.renderCharacter();
       this.setCharacterState('error', message);
-      if (!silent) ui.notifications.error(message);
+      if (!restore) ui.notifications.error(message);
       return null;
     } finally {
-      window.clearTimeout(timeout);
       this.isConnecting = false;
       this.updateConnectButtons();
     }
@@ -427,10 +459,15 @@ class FantasyOSDiceTray {
 
   async disconnectCharacter() {
     if (this.gameplay?.busy || this.isConnecting || this.isRolling) return;
+    try {
+      localStorage.setItem(this.connectionStorageKey, '');
+    } catch {
+      ui.notifications.error(localize('ConnectionStorageUnavailable'));
+      return;
+    }
     this.isConnecting = true;
     this.updateConnectButtons();
     try {
-      await game.settings.set(MODULE_ID, CHARACTER_SETTING, '');
       this.character = null;
       await this.gameplay.setCharacter(null);
       this.characterShareUrlInput.value = '';

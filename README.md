@@ -1,6 +1,6 @@
 # Fantasy-OS Dice
 
-Fantasy-OS Dice verbindet freigegebene Charaktere von fantasy-os.com mit Foundry VTT. Version 0.4.2 nutzt die native
+Fantasy-OS Dice verbindet freigegebene Charaktere von fantasy-os.com mit Foundry VTT. Version 0.4.3 nutzt die native
 Chat-Sichtbarkeit von Foundry VTT 14 und unterstützt weiterhin V13. Mit einem Spiel-Verbindungslink landen Würfe und
 Aktionen im Foundry-Chat und im FantasyOS-Spielverlauf. Ressourcen und Anwendungen werden im gemeinsamen Spielzustand
 gespeichert.
@@ -39,7 +39,7 @@ https://raw.githubusercontent.com/MartinWenskus/Fantasy-OS-Dice/refs/heads/main/
 Öffne anschließend deine Welt und aktiviere **Fantasy-OS Dice** unter **Spieleinstellungen → Module verwalten**.
 Nach dem Neuladen erscheint die Schaltfläche **FOS**. Weitere Versionen findest du im Setup über die Modul-Updates.
 
-Alternativ kannst du das [Installationspaket 0.4.2](https://raw.githubusercontent.com/MartinWenskus/Fantasy-OS-Dice/refs/heads/main/dist/fantasy-os-dice-0.4.2.zip) herunterladen und den enthaltenen Ordner
+Alternativ kannst du das [Installationspaket 0.4.3](https://raw.githubusercontent.com/MartinWenskus/Fantasy-OS-Dice/refs/heads/main/dist/fantasy-os-dice-0.4.3.zip) herunterladen und den enthaltenen Ordner
 `fantasy-os-dice` in `Data/modules/` im Foundry-Benutzerdatenordner entpacken.
 
 ## Mit einem Spiel verbinden (0.4.0)
@@ -81,7 +81,7 @@ sichtbar. Würfelergebnisse werden in Foundry erzeugt und vom Server protokollie
 3. Öffne in Foundry den Fantasy-OS-Würfelbecher.
 4. Füge den Link unter **Charakter-Anbindung** ein und wähle **Verbinden**.
 
-Das Modul lädt den Charakter beim nächsten Start automatisch erneut. Über die sechs Attributfelder würfelst du `1d20`
+Das Modul lädt den Charakter beim Start automatisch erneut. Bei vorübergehenden Fehlern versucht es die Wiederverbindung bis zu zweimal erneut. Über die sechs Attributfelder würfelst du `1d20`
 plus Grundwert, Bonus und Modifikator des synchronisierten Charakters. Behandle den Freigabelink wie ein Kennwort, weil
 er den lesenden Zugriff auf den freigegebenen Charakter ermöglicht.
 
@@ -117,20 +117,20 @@ Verbinden, vor Spielaktionen und mit jeder bestätigten Aktion aktualisiert. Fü
 Mit öffentlichem Charakterlink liegt der Verbrauch weiterhin in Foundry-Benutzerflags, getrennt nach Welt, Benutzer,
 Portaladresse und Charakter. Dieser Link gewährt ausschließlich lesenden Portalzugriff. Mehrere Tabs desselben
 Foundry-Benutzers sollten denselben Charakter nicht gleichzeitig bedienen; ausstehende Übertragungen liegen im lokalen
-Browser. Der private Spielschlüssel liegt nur in clientbezogenen Foundry-Einstellungen, nicht in gemeinsam lesbaren
-Benutzerflags.
+Browser. Spiel- und Charakterlinks liegen im Browser, getrennt nach Foundry-Welt und Benutzer. Beim ersten Start mit
+0.4.3 übernimmt das Modul einen vorhandenen Link für die aktuell geöffnete Welt und den angemeldeten Benutzer.
 
 ## Modul-API
 
 Das Modul stellt nach dem Foundry-Hook `ready` eine kleine API bereit:
 
 ```js
-const dice = game.modules.get('fantasy-os-dice').api;
+const dice = game.modules.get("fantasy-os-dice").api;
 
 dice.open();
-await dice.roll('1d20 + 5', 'public');
-await dice.connectCharacter('https://fantasy-os.com/character/123?key=…');
-await dice.rollCharacterAttribute('str', 'public');
+await dice.roll("1d20 + 5", "public");
+await dice.connectCharacter("https://fantasy-os.com/character/123?key=…");
+await dice.rollCharacterAttribute("str", "public");
 
 const character = dice.getCharacter();
 const state = dice.getGameState();
@@ -140,7 +140,7 @@ await dice.castSpell(123); // interne Zauber-ID, mit denselben Kosten-/Limitprü
 ```
 
 Erlaubte Sichtbarkeiten sind `public`, `gm`, `blind` und `self`. `syncCharacter()` aktualisiert die Daten, während
-`disconnectCharacter()` den gespeicherten Link aus den clientbezogenen Foundry-Einstellungen entfernt.
+`disconnectCharacter()` den gespeicherten Link für die aktuelle Foundry-Welt und den angemeldeten Benutzer entfernt.
 
 ## Entwicklung
 

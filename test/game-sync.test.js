@@ -144,6 +144,18 @@ const payload = () => ({
   state: portalRuntimeState(character, { mana: 9 }),
 });
 
+test('game connection reports an HTTP outage even when the response is not JSON', async (t) => {
+  const store = new PortalGameStore(connection, { storage: new MemoryStorage() });
+  t.mock.method(globalThis, 'fetch', async () => ({
+    ok: false,
+    status: 503,
+    json: async () => {
+      throw new SyntaxError('HTML response');
+    },
+  }));
+  await assert.rejects(store.refresh(), { message: 'GameSyncFailed', status: 503 });
+});
+
 test('uncertain requests survive reload and retry with the exact same ID/body', async (t) => {
   const storage = new MemoryStorage(),
     requests = [];
