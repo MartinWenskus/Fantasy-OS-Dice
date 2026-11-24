@@ -1,6 +1,6 @@
 # Fantasy-OS Dice
 
-Fantasy-OS Dice verbindet freigegebene Charaktere von fantasy-os.com mit Foundry VTT. Version 0.4.1 nutzt die native
+Fantasy-OS Dice verbindet freigegebene Charaktere von fantasy-os.com mit Foundry VTT. Version 0.4.2 nutzt die native
 Chat-Sichtbarkeit von Foundry VTT 14 und unterstützt weiterhin V13. Mit einem Spiel-Verbindungslink landen Würfe und
 Aktionen im Foundry-Chat und im FantasyOS-Spielverlauf. Ressourcen und Anwendungen werden im gemeinsamen Spielzustand
 gespeichert.
@@ -39,7 +39,7 @@ https://raw.githubusercontent.com/MartinWenskus/Fantasy-OS-Dice/refs/heads/main/
 Öffne anschließend deine Welt und aktiviere **Fantasy-OS Dice** unter **Spieleinstellungen → Module verwalten**.
 Nach dem Neuladen erscheint die Schaltfläche **FOS**. Weitere Versionen findest du im Setup über die Modul-Updates.
 
-Alternativ kannst du das [Installationspaket 0.4.1](https://raw.githubusercontent.com/MartinWenskus/Fantasy-OS-Dice/refs/heads/main/dist/fantasy-os-dice-0.4.1.zip) herunterladen und den enthaltenen Ordner
+Alternativ kannst du das [Installationspaket 0.4.2](https://raw.githubusercontent.com/MartinWenskus/Fantasy-OS-Dice/refs/heads/main/dist/fantasy-os-dice-0.4.2.zip) herunterladen und den enthaltenen Ordner
 `fantasy-os-dice` in `Data/modules/` im Foundry-Benutzerdatenordner entpacken.
 
 ## Mit einem Spiel verbinden (0.4.0)
